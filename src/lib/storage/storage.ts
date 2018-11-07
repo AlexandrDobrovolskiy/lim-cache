@@ -7,7 +7,6 @@ export class Storage implements IStorage {
   private head: StorageRecord;
   private tail: StorageRecord;
   private store: object;
-  private size: number;
   private limit: number;
 
   constructor(config: IStorageConfig, ...middleware: IStorageMiddleware[]) {
