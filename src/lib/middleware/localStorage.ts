@@ -2,21 +2,17 @@ import { IStorageMiddleware, IMiddlewareConfig } from "store.js";
 
 export class LocalStorageMiddleware implements IStorageMiddleware {
   private name: string = "storage";
-  private size: number;
-  private limit: number;
 
   constructor(config: IMiddlewareConfig){
-    this.limit = config.limit;
     this.name = config.name;
   }
 
-  onSave(state: object): void {
-    console.log(state);
+  onSave(store: object): void {
+    localStorage.setItem(name, JSON.stringify(store));
   }  
 
-  onLoad(state: object): void {
-    console.log(state, this.name, this.limit, this.size);
+  onLoad(store: object): any {
+    Object.assign(store, JSON.parse(localStorage.getItem(this.name)));
   }
 
-  
 }

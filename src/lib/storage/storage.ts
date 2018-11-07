@@ -1,5 +1,6 @@
 import { IStorage, IStorageMiddleware, IStorageConfig } from 'store.js';
 import StorageRecord from './StorageRecord';
+import sizeof from "sizeof";
 
 export class Storage implements IStorage {
   private middleware: IStorageMiddleware[];
@@ -16,13 +17,18 @@ export class Storage implements IStorage {
     this.store = {};
     this.head = null;
     this.tail = null;
+
+    for(let m of this.middleware){
+      m.onLoad(this.store);
+    }
+
   }
 
-  public register = (middleware: IStorageMiddleware): void => {
+  public register(middleware: IStorageMiddleware): void {
     this.middleware.push(middleware);
   }
 
-  setHead = node => {
+  setHead(node: StorageRecord){
     node.next = this.head;
     node.prev = null;
     if (this.head !== null) {
@@ -35,11 +41,11 @@ export class Storage implements IStorage {
     this.store[node.key] = node;
   };
 
-  public get = (key: string): any => {
-    return this.store[key];
+  public get(key: string):any{
+    return this.store[key].value;
   };
 
-  public set = (key: string, value: any): void => {
+  public set(key: string, value: any): void {
     const node = new StorageRecord(key, value);
 
     if (this.store[node.key]) {
@@ -54,9 +60,13 @@ export class Storage implements IStorage {
     }
 
     this.setHead(node);
+
+    for(let m of this.middleware){
+      m.onSave(this.store);
+    }
   };
 
-  public remove = (key: string) => {
+  public remove(key: string){
     const node = this.store[key];
     if (node.prev !== null) {
       node.prev.next = node.next;
@@ -71,9 +81,7 @@ export class Storage implements IStorage {
     delete this.store[key];
   };
 
-  private isFull = () => {
-    // Size checking here !!! dot forget to answer what type of checking you need (bytes or items)
-    console.log(this.size, this.limit);
-    return false;
+  private isFull(){
+    return sizeof(this.store) >= this.limit; 
   };
 }
