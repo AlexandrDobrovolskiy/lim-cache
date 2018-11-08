@@ -14,7 +14,7 @@ export class LocalStorageMiddleware implements IStorageMiddleware {
 
   onLoad(storage: IStorage): void {
     const records = JSON.parse(localStorage.getItem(this.name));
-    _.forOwn(records, (key, val) => {
+    _.forOwn(records, ({key}, val) => {
       storage.set(key, val);
     })
   }
