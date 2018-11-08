@@ -1,8 +1,8 @@
 import { IStorage, IStorageMiddleware, IStorageConfig } from 'store.js';
 import StorageRecord from './StorageRecord';
-import sizeof from "sizeof";
 
 export class Storage implements IStorage {
+  private sizeof: any;
   private middleware: IStorageMiddleware[];
   private head: StorageRecord;
   private tail: StorageRecord;
@@ -10,24 +10,23 @@ export class Storage implements IStorage {
   private limit: number;
 
   constructor(config: IStorageConfig, ...middleware: IStorageMiddleware[]) {
-    this.limit = config.limit;
-    this.limit = config.limit;
+    this.sizeof = require('sizeof').sizeof;
     this.middleware = middleware;
+    this.limit = config.limit;
     this.store = {};
     this.head = null;
     this.tail = null;
 
-    for(let m of this.middleware){
+    for (let m of this.middleware) {
       m.onLoad(this.store);
     }
-
   }
 
   public register(middleware: IStorageMiddleware): void {
     this.middleware.push(middleware);
   }
 
-  setHead(node: StorageRecord){
+  private setHead(node: StorageRecord) {
     node.next = this.head;
     node.prev = null;
     if (this.head !== null) {
@@ -38,11 +37,15 @@ export class Storage implements IStorage {
       this.tail = node;
     }
     this.store[node.key] = node;
-  };
+  }
 
-  public get(key: string):any{
+  public get(key: string): any {
+    if(!this.store[key]){
+      return null;
+    }
+    
     return this.store[key].value;
-  };
+  }
 
   public set(key: string, value: any): void {
     const node = new StorageRecord(key, value);
@@ -58,29 +61,47 @@ export class Storage implements IStorage {
       this.tail.next = null;
     }
 
-    this.setHead(node);
-
-    for(let m of this.middleware){
-      m.onSave(this.store);
+    if (this.limit > this.sizeof(node)) {
+      this.setHead(node);
+      
+      for (let m of this.middleware) {
+        m.onSave(this.store);
+      }
     }
-  };
+  }
 
-  public remove(key: string){
+  public remove(key: string): any {
     const node = this.store[key];
+
+    if(!node) {
+      return null;
+    }
+
+    let value = node.value;
+
     if (node.prev !== null) {
       node.prev.next = node.next;
     } else {
       this.head = node.next;
     }
+
     if (node.next !== null) {
       node.next.prev = node.prev;
     } else {
       this.tail = node.prev;
     }
-    delete this.store[key];
-  };
 
-  private isFull(){
-    return sizeof(this.store) >= this.limit; 
-  };
+    delete this.store[key];
+    return value;
+  }
+
+  public clear() {
+    this.store = {};
+    this.head = null;
+    this.tail = null;
+  }
+
+  private isFull() {
+    return this.sizeof(this.store) >= this.limit;
+  }
 }
