@@ -6,8 +6,10 @@ declare module 'store.js' {
   }
 
   export interface IStorageMiddleware {
-    onSave(item: any): void;
+    onSave(store: object): void;
     onLoad(state: object): void;
+    onRemove(state: object): void;
+    onClear(): void;
   }
 
   class IMiddlewareConfig {

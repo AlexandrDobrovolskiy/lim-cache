@@ -101,6 +101,11 @@ export class Storage implements IStorage {
     }
 
     delete this.store[key];
+
+    for (let m of this.middleware) {
+      m.onRemove(this);
+    }
+
     return value;
   }
 
@@ -108,6 +113,10 @@ export class Storage implements IStorage {
     this.store = {};
     this.head = null;
     this.tail = null;
+
+    for (let m of this.middleware) {
+      m.onClear();
+    }
   }
 
   private isFull() {

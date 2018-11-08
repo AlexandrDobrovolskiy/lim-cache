@@ -12,11 +12,19 @@ export class LocalStorageMiddleware implements IStorageMiddleware {
     localStorage.setItem(this.name, JSON.stringify(storage.getAll()));
   }  
 
-  onLoad(storage: IStorage): any {
+  onLoad(storage: IStorage): void {
     const records = JSON.parse(localStorage.getItem(this.name));
     _.forOwn(records, (key, val) => {
       storage.set(key, val);
     })
+  }
+
+  onRemove(storage: IStorage): void {
+    this.onSave(storage);
+  }
+
+  onClear(): void {
+    localStorage.clear();
   }
 
 }
