@@ -1,5 +1,6 @@
 import { IStorage, IStorageMiddleware, IStorageConfig } from 'store.js';
 import StorageRecord from './StorageRecord';
+import _ from "lodash";
 
 export class Storage implements IStorage {
   private sizeof: any;
@@ -18,7 +19,7 @@ export class Storage implements IStorage {
     this.tail = null;
 
     for (let m of this.middleware) {
-      m.onLoad(this.store);
+      m.onLoad(this);
     }
   }
 
@@ -37,6 +38,10 @@ export class Storage implements IStorage {
       this.tail = node;
     }
     this.store[node.key] = node;
+  }
+
+  public getAll(){
+    _.mapValues(this.store, (record: StorageRecord) => ({key: record.key, value: record.value}));
   }
 
   public get(key: string): any {
@@ -65,7 +70,7 @@ export class Storage implements IStorage {
       this.setHead(node);
       
       for (let m of this.middleware) {
-        m.onSave(this.store);
+        m.onSave(this);
       }
     }
   }

@@ -1,4 +1,5 @@
-import { IStorageMiddleware, IMiddlewareConfig } from "store.js";
+import { IStorageMiddleware, IMiddlewareConfig, IStorage } from "store.js";
+import _ from "lodash";
 
 export class LocalStorageMiddleware implements IStorageMiddleware {
   private name: string = "storage";
@@ -7,12 +8,15 @@ export class LocalStorageMiddleware implements IStorageMiddleware {
     this.name = config.name;
   }
 
-  onSave(store: object): void {
-    localStorage.setItem(name, JSON.stringify(store));
+  onSave(storage: IStorage): void {
+    localStorage.setItem(this.name, JSON.stringify(storage.getAll()));
   }  
 
-  onLoad(store: object): any {
-    Object.assign(store, JSON.parse(localStorage.getItem(this.name)));
+  onLoad(storage: IStorage): any {
+    const records = JSON.parse(localStorage.getItem(this.name));
+    _.forOwn(records, (key, val) => {
+      storage.set(key, val);
+    })
   }
 
 }

@@ -52,6 +52,8 @@
     "node": ">=8.9"
   },
   "dependencies": {
+    "@types/lodash": "^4.14.118",
+    "lodash": "^4.17.11",
     "sizeof": "^1.0.0"
   },
   "devDependencies": {
