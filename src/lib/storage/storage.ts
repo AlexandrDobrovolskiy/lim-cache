@@ -70,6 +70,10 @@ export class Storage implements IStorage {
     }
   }
 
+  public setLimit(limit: number) {
+    this.limit = limit;
+  }
+
   public remove(key: string): any {
     const node = this.store[key];
 
