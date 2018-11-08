@@ -40,8 +40,8 @@ export class Storage implements IStorage {
     this.store[node.key] = node;
   }
 
-  public getAll(){
-    _.mapValues(this.store, (record: StorageRecord) => ({key: record.key, value: record.value}));
+  public getAll(): object{
+    return _.mapValues(this.store, (record: StorageRecord) => ({key: record.key, value: record.value}));
   }
 
   public get(key: string): any {
