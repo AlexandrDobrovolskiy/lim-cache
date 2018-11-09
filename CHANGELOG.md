@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.3.8"></a>
+## [2.3.8](https://github.com/AlexandrDobrovolskiy/lim-cache/compare/v2.3.6...v2.3.8) (2018-11-09)
+
+
+
 <a name="2.3.6"></a>
 ## [2.3.6](https://github.com/AlexandrDobrovolskiy/lim-cache/compare/v2.3.4...v2.3.6) (2018-11-09)
 
