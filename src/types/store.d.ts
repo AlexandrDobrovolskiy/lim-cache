@@ -12,9 +12,9 @@ declare module 'store.js' {
     onClear(): void;
   }
 
-  class IMiddlewareConfig {
+  class LocalStorageMiddlewareConfig {
     name: string;
-    limit: number;
+    blacklist: Array<string>;
   }  
 
   export class IStorageConfig {

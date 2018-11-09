@@ -22,26 +22,17 @@ export class Storage implements IStorage {
       m.onLoad(this);
     }
   }
+  public setLimit(limit: number) {
+    this.limit = limit;
+  }
 
   public register(middleware: IStorageMiddleware): void {
     this.middleware.push(middleware);
   }
 
-  private setHead(node: StorageRecord) {
-    node.next = this.head;
-    node.prev = null;
-    if (this.head !== null) {
-      this.head.prev = node;
-    }
-    this.head = node;
-    if (this.tail === null) {
-      this.tail = node;
-    }
-    this.store[node.key] = node;
-  }
-
   public getAll(): object{
-    return _.mapValues(this.store, (record: StorageRecord) => ({key: record.key, value: record.value}));
+    return _.mapValues(this.store, 
+      (record: StorageRecord) => ({key: record.key, value: record.value}));
   }
 
   public get(key: string): any {
@@ -66,17 +57,13 @@ export class Storage implements IStorage {
       this.tail.next = null;
     }
 
-    if (this.limit > this.sizeof(node)) {
+    if (this.freeSpace() > this.sizeof(node)) {
       this.setHead(node);
       
       for (let m of this.middleware) {
         m.onSave(this);
       }
     }
-  }
-
-  public setLimit(limit: number) {
-    this.limit = limit;
   }
 
   public remove(key: string): any {
@@ -117,6 +104,26 @@ export class Storage implements IStorage {
     for (let m of this.middleware) {
       m.onClear();
     }
+  }
+
+  public freeSpace(){
+    return this.limit - this.sizeof(this.store);
+  }
+
+  private setHead(node: StorageRecord) {
+    node.next = this.head;
+    node.prev = null;
+
+    if (this.head !== null) {
+      this.head.prev = node;
+    }
+    this.head = node;
+
+    if (this.tail === null) {
+      this.tail = node;
+    }
+
+    this.store[node.key] = node;
   }
 
   private isFull() {
