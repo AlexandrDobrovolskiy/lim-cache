@@ -32,7 +32,7 @@ const localStorageConfig = {
   blacklist: ["DoNotPersist"]
 }
 
-const storage = createStorage(config, withLocalStorage(lsConfig))
+const storage = createStorage(config, withLocalStorage(localStorageConfig))
 ```
 Configuring: 
 * name: with this name data will be saved into localStorage (usefull if you have more then one storage).
