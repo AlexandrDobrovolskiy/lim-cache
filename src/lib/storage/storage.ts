@@ -129,7 +129,7 @@ export class Storage implements IStorage {
     this.store[node.key] = node;
   }
 
-  private isFull() {
+  public isFull() {
     return this.sizeof(this.store) >= this.limit;
   }
 }
