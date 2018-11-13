@@ -1,6 +1,6 @@
 import { IStorage, IStorageMiddleware, IStorageConfig } from 'store.js';
 import StorageRecord from './StorageRecord';
-import _ from "lodash";
+import _ from 'lodash';
 
 export class Storage implements IStorage {
   private sizeof: any;
@@ -30,46 +30,49 @@ export class Storage implements IStorage {
     this.middleware.push(middleware);
   }
 
-  public getAll(): object{
-    return _.mapValues(this.store, 
-      (record: StorageRecord) => ({key: record.key, value: record.value}));
+  public getAll(): object {
+    return _.mapValues(this.store, (record: StorageRecord) => ({
+      key: record.key,
+      value: record.value
+    }));
   }
 
   public get(key: string): any {
-    if(!this.store[key]){
+    if (!this.store[key]) {
       return null;
     }
-    
+
     return this.store[key].value;
   }
 
   public set(key: string, value: any): void {
     const node = new StorageRecord(key, value);
+    const size = this.sizeof(node);
+
+    if(this.limit < size){
+      return;
+    } 
 
     if (this.store[node.key]) {
       this.store[node.key].value = value;
       this.remove(node.key);
     }
 
-    while (this.isFull()) {
-      delete this.store[this.tail.key];
-      this.tail = this.tail.prev;
-      this.tail.next = null;
+    while (this.freeSpace() < size) {
+      this.remove(this.tail.key);
     }
 
-    if (this.freeSpace() > this.sizeof(node)) {
-      this.setHead(node);
-      
-      for (let m of this.middleware) {
-        m.onSave(this);
-      }
+    this.setHead(node);
+
+    for (let m of this.middleware) {
+      m.onSave(this);
     }
   }
 
   public remove(key: string): any {
     const node = this.store[key];
 
-    if(!node) {
+    if (!node) {
       return null;
     }
 
@@ -106,7 +109,7 @@ export class Storage implements IStorage {
     }
   }
 
-  public freeSpace(){
+  public freeSpace() {
     return this.limit - this.sizeof(this.store);
   }
 
